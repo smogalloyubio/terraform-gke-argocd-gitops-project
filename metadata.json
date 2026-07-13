@@ -1,0 +1,6 @@
+{
+  "name": "SimpleBank",
+  "description": "A simple full-stack banking web application featuring account creation, transfer of funds, deposit tracking, and transaction history.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
