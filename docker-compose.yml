@@ -1,0 +1,72 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: simplebank-postgres
+    environment:
+      POSTGRES_DB: simplebank
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./simplebank/schema.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    restart: unless-stopped
+
+  user-service:
+    build:
+      context: ./simplebank/backend/user-service
+      dockerfile: Dockerfile
+    container_name: simplebank-user-service
+    depends_on:
+      - postgres
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    restart: unless-stopped
+
+  account-service:
+    build:
+      context: ./simplebank/backend/account-service
+      dockerfile: Dockerfile
+    container_name: simplebank-account-service
+    depends_on:
+      - postgres
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    restart: unless-stopped
+
+  transaction-service:
+    build:
+      context: ./simplebank/backend/transaction-service
+      dockerfile: Dockerfile
+    container_name: simplebank-transaction-service
+    depends_on:
+      - postgres
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    restart: unless-stopped
+
+  simplebank:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: simplebank-app
+    depends_on:
+      - user-service
+      - account-service
+      - transaction-service
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+
