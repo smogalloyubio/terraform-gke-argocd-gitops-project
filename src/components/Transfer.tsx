@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Send, ArrowLeftRight, CheckCircle2, AlertCircle, HelpCircle, ShieldCheck } from 'lucide-react';
 import { User, Account } from '../types';
+import { API_CONFIG } from '../apiConfig';
 
 interface TransferProps {
   user: User;
@@ -49,7 +50,7 @@ export default function Transfer({
     setLoading(true);
 
     try {
-      const response = await axios.post('/api/transactions/transfer', {
+      const response = await axios.post(`${API_CONFIG.TRANSACTION_SERVICE}/api/transactions/transfer`, {
         sourceAccountId,
         receiverAccountNumber: receiverAccountNumber.trim(),
         amount: Number(amount),
