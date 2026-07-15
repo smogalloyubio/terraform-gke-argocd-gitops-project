@@ -1,13 +1,19 @@
-name: QA Engineer CI/CD
+name: gitaction workflow  pipeline 
 
 on:
   push:
     branches: [ qa-engineer ]
-  pull_request:
-    branches: [ qa-engineer ]
+
+    paths:
+      - ".github/workflows/qa-engineer-ci*"
+      - "simplebank/backend/account-service/**"
+      - "simplebank/backend/transaction-service/**"
+      - "simplebank/backend/user-service/**"
+      - "Dockerfile"
 
 jobs:
-  security-scan:
+  gitleaks-scan:
+    name: Secuirty  Gitleak Scanning 
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -17,21 +23,126 @@ jobs:
 
       - name: Run Gitleaks (Docker)
         run: |
-          echo "🔍 Running Gitleaks secret scan..."
+          echo "🔍 Running Gitleaks secret scan using Docker..."
           docker run --rm \
             -v ${{ github.workspace }}:/repo \
             zricethezav/gitleaks:latest \
             detect \
             --source=/repo \
+            --report-format=json \
+            --report-path=/repo/gitleaks-report.json \
             --redact \
             --verbose \
             --exit-code 1
 
-      - name: Run Checkov Scan
+     
+      - name: Upload Gitleaks report
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitleaks-report
+          path: gitleaks-report.json
+
+  checkov-terraform:
+    name: Secuirty Terraform scanning 
+    runs-on: ubuntu-latest
+    needs: gitleaks-scan
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov on Terraform
         run: |
-          echo "🛡️ Running Checkov scan on simplebank and Dockerfiles..."
-          docker run --rm \
-            -v ${{ github.workspace }}:/repo \
-            bridgecrew/checkov \
-            --directory /repo/simplebank \
-            --check CKV_DOCKER_*
+          checkov \
+            -d ./Terraform \
+            --framework terraform \
+            --output json \
+            > checkov-terraform-report.json || true
+
+      - name: Upload Terraform Checkov report
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkov-terraform-report
+          path: checkov-terraform-report.json
+
+  checkov-backend-dockerfile:
+    runs-on: ubuntu-latest
+    needs: gitleaks-scan
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov on backend  Dockerfiles
+        run: |
+          checkov \
+            -d ./simplebank/backend/account-service/ \
+            --framework dockerfile \
+            --output json \
+            > checkov-backend-account-service-dockerfile-report.json || true
+
+      - name: Upload Dockerfile Checkov report
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkov-backend-account-service-dockerfile-report
+          path: checkov-backend-account-service-dockerfile-report.json
+
+  checkov-user-service-dockerfile:
+    runs-on: ubuntu-latest
+    needs: gitleaks-scan
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov on backend  Dockerfiles
+        run: |
+          checkov \
+            -d ./simplebank/backend/user-service/ \
+            --framework dockerfile \
+            --output json \
+            > checkov-backend-user-service-dockerfile-report.json || true
+
+      - name: Upload Dockerfile Checkov report
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkov-backend-user-service-dockerfile-report
+          path: checkov-backend-user-service-dockerfile-report.json
+
+
+  checkov-dockerfile:
+    runs-on: ubuntu-latest
+    needs: gitleaks-scan
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov on Dockerfiles
+        run: |
+          checkov \
+            -d . \
+            --framework dockerfile \
+            --output json \
+            > checkov-dockerfile-report.json || true
+
+      - name: Upload Dockerfile Checkov report
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkov-dockerfile-report
+          path: checkov-dockerfile-report.json
+      
+  
+ 
