@@ -8,7 +8,6 @@ on:
 
 jobs:
   security-scan:
-    name: Secuirty  Gitleak Scanning 
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -18,49 +17,21 @@ jobs:
 
       - name: Run Gitleaks (Docker)
         run: |
-          echo "🔍 Running Gitleaks secret scan using Docker..."
+          echo "🔍 Running Gitleaks secret scan..."
           docker run --rm \
             -v ${{ github.workspace }}:/repo \
             zricethezav/gitleaks:latest \
             detect \
             --source=/repo \
-            --report-format=json \
-            --report-path=/repo/gitleaks-report.json \
             --redact \
             --verbose \
             --exit-code 1
 
-     
-      - name: Upload Gitleaks report
-        uses: actions/upload-artifact@v4
-        with:
-          name: gitleaks-report
-          path: gitleaks-report.json
-
-  checkov-terraform:
-    name: Secuirty Terraform scanning 
-    runs-on: ubuntu-latest
-    needs: security-scan
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Checkov
-        run: pip install checkov
-
-      - name: Run Checkov on Terraform
+      - name: Run Checkov Scan
         run: |
-          checkov \
-            -d ./Terraform \
-            --framework terraform \
-            --output json \
-            > checkov-terraform-report.json || true
-
-      - name: Upload Terraform Checkov report
-        uses: actions/upload-artifact@v4
-        with:
-          name: checkov-terraform-report
-          path: checkov-terraform-report.json
-      
- 
+          echo "🛡️ Running Checkov scan on simplebank and Dockerfiles..."
+          docker run --rm \
+            -v ${{ github.workspace }}:/repo \
+            bridgecrew/checkov \
+            --directory /repo/simplebank \
+            --check CKV_DOCKER_*
