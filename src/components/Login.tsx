@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Mail, Lock, User as UserIcon, Wallet, ArrowRight, ShieldCheck, HelpCircle } from 'lucide-react';
 import { User, Account } from '../types';
+import { API_CONFIG } from '../apiConfig';
 
 interface LoginProps {
   onLoginSuccess: (user: User, accounts: Account[]) => void;
@@ -37,7 +38,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     try {
       if (isRegister) {
         // Register API flow
-        const response = await axios.post('/api/users', {
+        const response = await axios.post(`${API_CONFIG.USER_SERVICE}/api/users`, {
           firstName,
           lastName,
           email,
@@ -49,7 +50,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         onLoginSuccess(user, [account]);
       } else {
         // Login API flow
-        const response = await axios.post('/api/login', {
+        const response = await axios.post(`${API_CONFIG.USER_SERVICE}/api/users/login`, {
           email,
           password,
         });
