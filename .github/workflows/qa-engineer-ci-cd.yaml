@@ -220,7 +220,7 @@ jobs:
 
 
       - name: Trivy FS Scan - Account Service
-        uses: qasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@master
         with:
           scan-type: "fs"
           scan-path: "./simplebank/backend/account-service"
@@ -230,7 +230,7 @@ jobs:
 
      
       - name: Trivy FS Scan - User Service
-        uses: qasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@master
         with:
           scan-type: "fs"
           scan-path: "./simplebank/backend/user-service"
@@ -240,7 +240,7 @@ jobs:
 
     
       - name: Trivy FS Scan - Transaction Service
-        uses: qasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@master
         with:
           scan-type: "fs"
           scan-path: "./simplebank/backend/transaction-service"
@@ -250,7 +250,7 @@ jobs:
 
   
       - name: Trivy FS Scan - Frontend
-        uses: qasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@master
         with:
           scan-type: "fs"
           scan-path: "./src"
