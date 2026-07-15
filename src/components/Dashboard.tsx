@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ArrowUpRight, ArrowDownLeft, CreditCard, DollarSign, Plus, Send, RefreshCw, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
 import { User, Account, Transaction } from '../types';
+import { API_CONFIG } from '../apiConfig';
 
 interface DashboardProps {
   user: User;
@@ -33,7 +34,7 @@ export default function Dashboard({
     if (!activeAccount) return;
     setLoadingTx(true);
     try {
-      const response = await axios.get(`/api/transactions/${activeAccount.id}`);
+      const response = await axios.get(`${API_CONFIG.TRANSACTION_SERVICE}/api/transactions/${activeAccount.id}`);
       // Take only first 5 recent transactions
       setRecentTransactions(response.data.slice(0, 5));
     } catch (err) {
@@ -58,7 +59,7 @@ export default function Dashboard({
     setDepositMessage({ text: '', type: '' });
 
     try {
-      await axios.post('/api/transactions/deposit', {
+      await axios.post(`${API_CONFIG.TRANSACTION_SERVICE}/api/transactions/deposit`, {
         accountId: activeAccount.id,
         amount: Number(depositAmount),
       });
