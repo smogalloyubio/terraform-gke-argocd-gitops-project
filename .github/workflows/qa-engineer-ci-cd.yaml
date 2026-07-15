@@ -1,0 +1,38 @@
+name: QA Engineer CI/CD
+
+on:
+  push:
+    branches: [ qa-engineer ]
+  pull_request:
+    branches: [ qa-engineer ]
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks (Docker)
+        run: |
+          echo "🔍 Running Gitleaks secret scan using Docker..."
+          docker run --rm \
+            -v ${{ github.workspace }}:/repo \
+            zricethezav/gitleaks:latest \
+            detect \
+            --source=/repo \
+            --report-format=json \
+            --report-path=/repo/gitleaks-report.json \
+            --redact \
+            --verbose \
+            --exit-code 1
+
+     
+      - name: Upload Gitleaks report
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitleaks-report
+          path: gitleaks-report.json
+1

@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
 import Transfer from './components/Transfer';
 import History from './components/History';
+import { API_CONFIG } from './apiConfig';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -33,7 +34,7 @@ export default function App() {
   const refreshAccounts = async () => {
     if (!user) return;
     try {
-      const response = await axios.get(`/api/users/${user.id}/accounts`);
+      const response = await axios.get(`${API_CONFIG.ACCOUNT_SERVICE}/api/accounts/user/${user.id}`);
       const updatedAccounts = response.data;
       setAccounts(updatedAccounts);
       // Maintain selected account reference updated

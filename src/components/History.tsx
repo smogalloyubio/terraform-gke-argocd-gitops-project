@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ArrowDownLeft, ArrowUpRight, Search, Filter, RefreshCw, AlertCircle, Calendar } from 'lucide-react';
 import { User, Account, Transaction } from '../types';
+import { API_CONFIG } from '../apiConfig';
 
 interface HistoryProps {
   user: User;
@@ -24,7 +25,7 @@ export default function History({ user, accounts, activeAccount }: HistoryProps)
     if (!selectedAccountId) return;
     setLoading(true);
     try {
-      const response = await axios.get(`/api/transactions/${selectedAccountId}`);
+      const response = await axios.get(`${API_CONFIG.TRANSACTION_SERVICE}/api/transactions/${selectedAccountId}`);
       setTransactions(response.data);
     } catch (err) {
       console.error('Error loading transaction history:', err);

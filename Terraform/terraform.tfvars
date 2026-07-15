@@ -1,0 +1,9 @@
+project_id   = "your-gcp-project-id"
+region       = "us-central1"
+zone         = "us-central1-a"
+network_name = "k3s-vpc"
+subnet_name  = "k3s-subnet"
+master_name  = "k3s-master"
+worker_names = ["k3s-worker-1", "k3s-worker-2"]
+machine_type = "e2-medium"
+image        = "debian-cloud/debian-11"
