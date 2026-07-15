@@ -15,7 +15,24 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Gitleaks Scan
+      - name: Run Gitleaks (Docker)
         run: |
-          docker run -v ${{ github.workspace }}:/path zricethezav/gitleaks:latest detect --source /path --verbose
+          echo "🔍 Running Gitleaks secret scan using Docker..."
+          docker run --rm \
+            -v ${{ github.workspace }}:/repo \
+            zricethezav/gitleaks:latest \
+            detect \
+            --source=/repo \
+            --report-format=json \
+            --report-path=/repo/gitleaks-report.json \
+            --redact \
+            --verbose \
+            --exit-code 1
+
+     
+      - name: Upload Gitleaks report
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitleaks-report
+          path: gitleaks-report.json
 1
