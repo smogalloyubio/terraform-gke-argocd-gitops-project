@@ -208,3 +208,63 @@ jobs:
             checkov-k8s-account.json
             checkov-k8s-transaction.json
             checkov-k8s-user.json
+
+  trivy-qasecurity-fs-scan:
+    name: Security - Trivy FS Scan (Backend + Frontend)
+    runs-on: ubuntu-latest
+    needs: gitleaks-scan
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
+      - name: Trivy FS Scan - Account Service
+        uses: qasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-path: "./simplebank/backend/account-service"
+          severity: "HIGH,CRITICAL"
+          format: "json"
+          output: "trivy-account-service.json"
+
+     
+      - name: Trivy FS Scan - User Service
+        uses: qasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-path: "./simplebank/backend/user-service"
+          severity: "HIGH,CRITICAL"
+          format: "json"
+          output: "trivy-user-service.json"
+
+    
+      - name: Trivy FS Scan - Transaction Service
+        uses: qasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-path: "./simplebank/backend/transaction-service"
+          severity: "HIGH,CRITICAL"
+          format: "json"
+          output: "trivy-transaction-service.json"
+
+  
+      - name: Trivy FS Scan - Frontend
+        uses: qasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-path: "./src"
+          severity: "HIGH,CRITICAL"
+          format: "json"
+          output: "trivy-frontend.json"
+
+      - name: Upload Trivy FS Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-fs-reports
+          path: |
+            trivy-account-service.json
+            trivy-user-service.json
+            trivy-transaction-service.json
+            trivy-frontend.json
+
