@@ -1,0 +1,26 @@
+name:  Devsecops pipline that build. and deploy microservice application to google cloud 
+
+on:
+  push:
+    branches: [ qa-engineer ]
+  pull_request:
+    branches: [ qa-engineer ]
+  paths:
+    - ".github/workflows/qa-engineer*"
+    - "simplebank/account-service/*"
+    - "simplebank/transaction-service/*"
+    - "simplebank/user-service/*"
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks Scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
