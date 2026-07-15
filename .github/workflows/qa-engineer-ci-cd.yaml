@@ -35,4 +35,3 @@ jobs:
         with:
           name: gitleaks-report
           path: gitleaks-report.json
-1
