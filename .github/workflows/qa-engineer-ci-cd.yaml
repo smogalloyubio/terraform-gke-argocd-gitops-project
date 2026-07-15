@@ -118,6 +118,31 @@ jobs:
           name: checkov-backend-user-service-dockerfile-report
           path: checkov-backend-user-service-dockerfile-report.json
 
+  checkov-transaction-service-dockerfile:
+    runs-on: ubuntu-latest
+    needs: gitleaks-scan
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov on backend  Dockerfiles
+        run: |
+          checkov \
+            -d ./simplebank/backend/transaction-service/ \
+            --framework dockerfile \
+            --output json \
+            > checkov-backend-transaction-service-dockerfile-report.json || true
+
+      - name: Upload Dockerfile Checkov report
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkov-backend-transaction-service-dockerfile-report
+          path: checkov-backend-transaction-service-dockerfile-report.json
+
 
   checkov-dockerfile:
     runs-on: ubuntu-latest
