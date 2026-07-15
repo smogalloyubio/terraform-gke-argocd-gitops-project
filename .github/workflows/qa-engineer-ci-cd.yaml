@@ -168,6 +168,46 @@ jobs:
         with:
           name: checkov-dockerfile-report
           path: checkov-dockerfile-report.json
+
+  checkov-kubernetes:
+  name: Security Kubernetes YAML Scanning (Multi-Directory)
+  runs-on: ubuntu-latest
+  needs: gitleaks-scan
+
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Checkov
+      run: pip install checkov
+
+    - name: Run Checkov on Kubernetes Manifests
+      run: |
+        echo "🔍 Running Checkov Kubernetes scan across all directories..."
+
+       
+        checkov -d ./k8s/account-service \
+          --framework kubernetes \
+          --output json \
+          > checkov-k8s-account.json || true
+
       
-  
- 
+        checkov -d ./k8s/transaction-service \
+          --framework kubernetes \
+          --output json \
+          > checkov-k8s-transaction.json || true
+
+   
+        checkov -d ./k8s/user-service \
+          --framework kubernetes \
+          --output json \
+          > checkov-k8s-user.json || true
+
+    - name: Upload Kubernetes Checkov Reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: checkov-kubernetes-reports
+        path: |
+          checkov-k8s-account.json
+          checkov-k8s-transaction.json
+          checkov-k8s-user.json
